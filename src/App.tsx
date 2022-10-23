@@ -2,23 +2,18 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import Template from './component/template'
+import Tab from './component/Tab';
+
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>aloha
+
+      <Template height="30">
+
+          <Tab id="1" name="tab1" url="aaa"></Tab>
+          <Tab id="2" name="tab2" url="Bbb"></Tab>
+      </Template>
     </div>
   );
 }
