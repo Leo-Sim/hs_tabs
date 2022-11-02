@@ -1,9 +1,12 @@
 import '../css/global.css'
 
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { BrowserRouter, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+
+import TabDialog from './dialog/tabDialog'
+import Tab from "./Tab";
 
 interface TemplateProps {
     children: React.ReactElement | React.ReactElement[]
@@ -13,8 +16,9 @@ interface TemplateProps {
     manualAdd?: boolean
 }
 
-
+let aaa:number =0;
 export default ( props: TemplateProps) => {
+
 
     const children = props.children;
 
@@ -29,10 +33,7 @@ export default ( props: TemplateProps) => {
         manualAdd = true;
     }
 
-    // if(children.type === React) {
-    //
-    // }
-
+    let [tabs, setTabs] = useState<any>();
     const [enable, setEnable] = useState<string>('');
 
     const newChildren = React.Children.map(children, (child, index) => {
@@ -51,13 +52,33 @@ export default ( props: TemplateProps) => {
         }
     });
 
+    tabs = newChildren;
+
+
+    useEffect(() => {
+        // setTabs(newChildren);
+    });
+
+    const createTab = (event: React.MouseEvent, id: string, name: string, url: string) => {
+
+        newChildren.push(React.createElement('Tab', {
+            id: id,
+            name: name,
+            url: url,
+            setEnable: setEnable,
+            isEnable: false
+        },''));
+
+// setTabs(newChildren)
+    }
+
 
     return (
         <div style={{minHeight: '30px', height: tabHeight + 'px'}} className={"w-full"}>
             <BrowserRouter>
                 <div className={"h-full inline-block"}>
 
-                    { newChildren }
+                    { tabs }
 
                 </div>
 
@@ -70,6 +91,10 @@ export default ( props: TemplateProps) => {
                 }
 
             </BrowserRouter>
+
+           <div className={"inline-block absolute right-1/2 top-1/3"}>
+               <TabDialog clickEvent={createTab}></TabDialog>
+           </div>
         </div>
     )
 }
