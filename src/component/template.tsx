@@ -16,9 +16,59 @@ interface TemplateProps {
     manualAdd?: boolean
 }
 
-let aaa:number =0;
+let tabList: React.ReactElement[] ;
+
 export default ( props: TemplateProps) => {
 
+    useEffect(() => {
+    });
+
+    const removeTab = (event: React.MouseEvent, id: string) => {
+        const targetTabList = getTargetList();
+        const removedList = targetTabList.filter(tab => tab.props.id != id);
+
+        tabList = removedList;
+
+        setTabs(removedList)
+    }
+
+    // dynamically add new tab
+    const createTab = (event: React.MouseEvent, id: string, name: string, url: string) => {
+        const targetTabList = getTargetList();
+
+        const isExist = targetTabList.filter(tab => tab.props.id === id).length > 0 ? true: false;
+
+        if(isExist) {
+            alert('');
+            return;
+        }
+
+        const prop = {
+            id: id,
+            name: name,
+            url: url,
+            setEnable: setEnable,
+            isEnable: false,
+            remove: removeTab
+        };
+
+        const newTab :React.ReactElement = Tab(prop);
+
+
+        targetTabList.push(newTab)
+
+        const newTabList = React.Children.map(targetTabList, tab => tab);
+        tabList = newTabList;
+
+        setTabs(newTabList)
+    }
+
+
+    // draw tabs with 'newChildren' for first render,
+    // draw tabs with tabList which has dynamically added or removed tabs after first render
+    const getTargetList = () => {
+        return tabList == undefined? newChildren : tabList;
+    }
 
     const children = props.children;
 
@@ -33,7 +83,6 @@ export default ( props: TemplateProps) => {
         manualAdd = true;
     }
 
-    let [tabs, setTabs] = useState<any>();
     const [enable, setEnable] = useState<string>('');
 
     const newChildren = React.Children.map(children, (child, index) => {
@@ -46,31 +95,17 @@ export default ( props: TemplateProps) => {
 
             return React.cloneElement(child as React.ReactElement,{
                 setEnable: setEnable,
-                isEnable: isEnabled
+                isEnable: isEnabled,
+                remove: removeTab
             });
 
         }
     });
 
-    tabs = newChildren;
 
 
-    useEffect(() => {
-        // setTabs(newChildren);
-    });
+    let [tabs, setTabs] = useState<any>(getTargetList());
 
-    const createTab = (event: React.MouseEvent, id: string, name: string, url: string) => {
-
-        newChildren.push(React.createElement('Tab', {
-            id: id,
-            name: name,
-            url: url,
-            setEnable: setEnable,
-            isEnable: false
-        },''));
-
-// setTabs(newChildren)
-    }
 
 
     return (
