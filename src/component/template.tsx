@@ -1,6 +1,6 @@
 import '../css/global.css'
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BrowserRouter, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -29,18 +29,42 @@ export default ( props: TemplateProps) => {
 
         tabList = removedList;
 
-        setTabs(removedList)
+        setTabs(removedList);
     }
+
+    // useStates that would change dialog inputs
+    let [alertId, changeAlertId] = useState<boolean>(false);
+    let [alertName, changeAlertName] = useState<boolean>(false);
+    let [alertUrl, changeAlertUrl] = useState<boolean>(false);
+
+    let [dialogDisplay, setDialogDisplay] = useState<string>('hidden');
+
+    let tmpId: boolean;
+    let tmpName: boolean;
+    let tmpUrl: boolean;
 
     // dynamically add new tab
     const createTab = (event: React.MouseEvent, id: string, name: string, url: string) => {
         const targetTabList = getTargetList();
 
+        // check if id is already exist
         const isExist = targetTabList.filter(tab => tab.props.id === id).length > 0 ? true: false;
 
-        if(isExist) {
-            alert('');
-            return;
+        // check if input has text
+        tmpId = !id ? true : false;
+        tmpName = !name ? true : false;
+        tmpUrl = !url ? true : false;
+
+        if(id && isExist) {
+            tmpId = true;
+        }
+
+        changeAlertId(tmpId);
+        changeAlertName(tmpName);
+        changeAlertUrl(tmpUrl);
+
+        if(tmpId || tmpName || tmpUrl) {
+            return false;
         }
 
         const prop = {
@@ -61,6 +85,10 @@ export default ( props: TemplateProps) => {
         tabList = newTabList;
 
         setTabs(newTabList)
+
+        setDialogDisplay('hidden')
+
+        return true;
     }
 
 
@@ -102,10 +130,7 @@ export default ( props: TemplateProps) => {
         }
     });
 
-
-
     let [tabs, setTabs] = useState<any>(getTargetList());
-
 
 
     return (
@@ -120,15 +145,15 @@ export default ( props: TemplateProps) => {
                 {
                     manualAdd &&
                     <div className={"inline-block cursor-pointer hover:text-blue-400"}>
-                        <FontAwesomeIcon icon={ faPlus } size="xl"></FontAwesomeIcon>
+                        <FontAwesomeIcon icon={ faPlus } size="xl" onClick={(event) => setDialogDisplay('')}></FontAwesomeIcon>
                     </div>
 
                 }
 
             </BrowserRouter>
 
-           <div className={"inline-block absolute right-1/2 top-1/3"}>
-               <TabDialog clickEvent={createTab}></TabDialog>
+           <div className={ dialogDisplay + " absolute right-1/2 top-1/3"}>
+               <TabDialog idAlert={ alertId } nameAlert={ alertName } urlAlert={ alertUrl } clickEvent={ createTab }></TabDialog>
            </div>
         </div>
     )
