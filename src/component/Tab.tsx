@@ -32,6 +32,15 @@ export default (props: TapProps) => {
     // class for not activated tabs.
     const disabledClass = [width, tabClass, display, margin, textDisabled, border].join(' ');
 
+    const navigate = useNavigate();
+    const handleOnClick = useCallback(() => navigate('/' + props.url, {replace: true}), [navigate]);
+
+    useEffect(() => {
+        if(props.isEnable) {
+            handleOnClick()
+        }
+    },[])
+
     return(
             <div id={props.id} className={ props.isEnable? tabClass : disabledClass } onClick={() => {props.setEnable(props.id)}}>
                 <Link to={props.url} className={ hover }>{ props.name } </Link>
