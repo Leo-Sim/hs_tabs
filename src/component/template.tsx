@@ -1,13 +1,11 @@
 import '../css/global.css'
 
 import React, { useEffect, useState, useRef } from "react";
-import { BrowserRouter, Link } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-
-
 
 
 interface TemplateProps {
@@ -38,22 +36,24 @@ export default ( props: TemplateProps) => {
 
     validate(props);
 
-    // const children = props.children;
-
     const children = globalTabs == undefined? props.children : globalTabs;
 
     let tabHeight;
-    let manualAdd;
+
 
     if(!props.height) {
         tabHeight = '30'
     }
 
-    if(!manualAdd) {
-        manualAdd = true;
+    let initEanble: string;
+    if(children && Array.isArray(children)) {
+       initEanble = children[0].props.id;
+    } else {
+        initEanble = children.props.id;
     }
-    let [tabs, setTabs] = useState<any>();
-    const [enable, setEnable] = useState<string>('');
+
+
+    const [enable, setEnable] = useState<string>(initEanble);
 
     let newChildren = React.Children.map(children, (child, index) => {
 
@@ -72,19 +72,49 @@ export default ( props: TemplateProps) => {
 
     globalTabs = newChildren;
 
-
     let [animation, setAnimation] = useState<string>()
     let [count, increaseCount] = useState<number>(0)
-    const moveRight = () => {
+    const moveLeft = () => {
         const first: any = globalTabs.shift();
         globalTabs.push(first);
-        increaseCount(count + 1);
+        moveSelectedTab(globalTabs, false);
+        // increaseCount(count + 1);
     };
 
-    const moveLeft = () => {
+    const moveRight = () => {
         const last: any = globalTabs.pop();
         globalTabs.unshift(last);
-        increaseCount(count + 1);
+        moveSelectedTab(globalTabs, true);
+        // increaseCount(count + 1);
+    }
+
+
+    const moveSelectedTab = (tabs: React.ReactElement[], direction: boolean) => {
+
+        let selected;
+
+        const curSelected: string = enable;
+        let curSelectedIndex: number = 0;
+
+        tabs.forEach((tab, index) => {
+            if(curSelected === tab.props.id) {
+                curSelectedIndex = index;
+                // navigate(tab.props.url);
+
+            }
+        })
+
+        //right
+        if(direction) {
+            selected = tabs[curSelectedIndex - 1].props.id
+        }
+        //left
+        else {
+            selected = tabs[curSelectedIndex + 1].props.id
+        }
+
+
+        setEnable(selected);
     }
 
 
@@ -105,13 +135,4 @@ export default ( props: TemplateProps) => {
     )
 }
 
-const moveSelectedTab = (globalTabs: React.ReactElement[], direction: boolean) => {
-    //right
-    if(direction) {
 
-    }
-    //left
-    else {
-
-    }
-}

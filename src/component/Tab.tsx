@@ -1,9 +1,7 @@
 import '../css/global.css'
 
-import React, {useEffect} from "react";
-import { BrowserRouter, Link } from "react-router-dom";
-
-
+import React, {forwardRef, useEffect, useRef, useCallback} from "react";
+import { BrowserRouter, Link, useNavigate } from "react-router-dom";
 
 let bgColor = 'white';
 let display = 'inline-block';
@@ -29,15 +27,12 @@ interface TapProps {
 
 export default (props: TapProps) => {
 
-
-
     // class for activated tab.
     const tabClass = [width, bgColor, display, margin, text, border].join(' ');
     // class for not activated tabs.
     const disabledClass = [width, tabClass, display, margin, textDisabled, border].join(' ');
 
     return(
-
             <div id={props.id} className={ props.isEnable? tabClass : disabledClass } onClick={() => {props.setEnable(props.id)}}>
                 <Link to={props.url} className={ hover }>{ props.name } </Link>
             </div>
