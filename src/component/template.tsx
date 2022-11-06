@@ -11,8 +11,7 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 interface TemplateProps {
     children: React.ReactElement | React.ReactElement[]
     height?: string,
-    // max num of tabs
-    max?: number,
+
     // num of  range -> 5~10
     numOfDisplay?: number
 
@@ -21,9 +20,7 @@ interface TemplateProps {
 let globalTabs: React.ReactElement[];
 
 const validate = (props: TemplateProps) => {
-    if(props.max && props.max < 1) {
-        console.error('property \'max\' can\'t be lower than 1');
-    }
+
     if(props.numOfDisplay && (props.numOfDisplay < 5 || props.numOfDisplay > 10)) {
         console.error('property \'numOfDisplay\' should be between 5-10');
     }
@@ -36,20 +33,28 @@ export default ( props: TemplateProps) => {
 
     validate(props);
 
+    let numOfDisplay = props.numOfDisplay? props.numOfDisplay : 10;
+
     const children = globalTabs == undefined? props.children : globalTabs;
 
     let tabHeight;
-
 
     if(!props.height) {
         tabHeight = '30'
     }
 
+    // determine if 'children' is array. set default active tab.
     let initEanble: string;
     if(children && Array.isArray(children)) {
        initEanble = children[0].props.id;
     } else {
         initEanble = children.props.id;
+    }
+
+    const tabCount: number = React.Children.count(children);
+    let arrowClass = 'hidden';
+    if(numOfDisplay < tabCount) {
+        arrowClass = '';
     }
 
 
@@ -122,14 +127,14 @@ export default ( props: TemplateProps) => {
         <div style={{minHeight: '30px', height: tabHeight + 'px'}} className={"w-full"}>
 
 
-            <FontAwesomeIcon icon={ faArrowLeft } size="lg" className={"mr-2 cursor-pointer "} onClick={ moveLeft }></FontAwesomeIcon>
+            <FontAwesomeIcon icon={ faArrowLeft } size="lg" className={"mr-2 cursor-pointer " + arrowClass} onClick={ moveLeft }></FontAwesomeIcon>
             <BrowserRouter>
                 <div className={"h-full inline-block animation1"} >
                     { globalTabs }
                 </div>
 
             </BrowserRouter>
-            <FontAwesomeIcon icon={ faArrowRight } size="lg" className={"cursor-pointer "} onClick={ moveRight }></FontAwesomeIcon>
+            <FontAwesomeIcon icon={ faArrowRight } size="lg" className={"cursor-pointer " + arrowClass} onClick={ moveRight }></FontAwesomeIcon>
 
         </div>
     )
