@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 
-interface TemplateProps {
+interface TabsProps {
     children: React.ReactElement | React.ReactElement[]
     height?: string,
 
@@ -17,14 +17,14 @@ interface TemplateProps {
 
 let globalTabs: React.ReactElement[];
 
-const validate = (props: TemplateProps) => {
+const validate = (props: TabsProps) => {
 
     if(props.numOfShow && (props.numOfShow < 5 || props.numOfShow > 10)) {
         console.error('property \'numOfShow\' should be between 5-10');
     }
 }
 
-export default ( props: TemplateProps) => {
+export default ( props: TabsProps) => {
 
     useEffect(() => {
     });
