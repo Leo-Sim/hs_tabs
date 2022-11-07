@@ -17,20 +17,23 @@ let border = 'border-t border-r border-l border-gray-400 border-solid rounded-tl
 
 
 interface TapProps {
-    id: string,
-    name: string,
+    id: string
+    name: string
     url: string
-    setEnable?: any,
+    setEnable?: any
     isEnable?: boolean
-    remove?: Function,
+    isHidden?: boolean
+    remove?: Function
 }
 
 export default (props: TapProps) => {
 
+   const hidden = props.isHidden? 'hidden' : '';
+
     // class for activated tab.
     const tabClass = [width, bgColor, display, margin, text, border].join(' ');
     // class for not activated tabs.
-    const disabledClass = [width, tabClass, display, margin, textDisabled, border].join(' ');
+    const disabledClass = [width, tabClass, display, margin, textDisabled, border, hidden].join(' ');
 
     const navigate = useNavigate();
     const handleOnClick = useCallback(() => navigate('/' + props.url, {replace: true}), [navigate]);

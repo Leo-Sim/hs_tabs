@@ -1,8 +1,6 @@
 import '../css/global.css'
 
 import React, { useEffect, useState, useRef } from "react";
-import { BrowserRouter } from "react-router-dom";
-
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
@@ -13,7 +11,7 @@ interface TemplateProps {
     height?: string,
 
     // num of  range -> 5~10
-    numOfDisplay?: number
+    numOfShow?: number
 
 }
 
@@ -21,8 +19,8 @@ let globalTabs: React.ReactElement[];
 
 const validate = (props: TemplateProps) => {
 
-    if(props.numOfDisplay && (props.numOfDisplay < 5 || props.numOfDisplay > 10)) {
-        console.error('property \'numOfDisplay\' should be between 5-10');
+    if(props.numOfShow && (props.numOfShow < 5 || props.numOfShow > 10)) {
+        console.error('property \'numOfShow\' should be between 5-10');
     }
 }
 
@@ -33,7 +31,7 @@ export default ( props: TemplateProps) => {
 
     validate(props);
 
-    let numOfDisplay = props.numOfDisplay? props.numOfDisplay : 10;
+    let numOfShow = props.numOfShow? props.numOfShow : 10;
 
     const children = globalTabs == undefined? props.children : globalTabs;
 
@@ -52,13 +50,21 @@ export default ( props: TemplateProps) => {
     }
 
     const tabCount: number = React.Children.count(children);
-    let arrowClass = 'hidden';
-    if(numOfDisplay < tabCount) {
-        arrowClass = '';
+
+    let showArrow: boolean = false;
+    if(numOfShow < tabCount) {
+        showArrow = true;
     }
 
+    // show some tabs and hide the rest
+    let tabsToShow: string[] = [];
+    if(showArrow && children && Array.isArray(children)) {
+        let i = 0;
+        tabsToShow = children.filter(tab => numOfShow > i++).map((tab, index) => tab.props.id);
+    }
 
     const [enable, setEnable] = useState<string>(initEanble);
+    const [showTabIds, setShowTabIds] = useState<string[]>();
 
     let newChildren = React.Children.map(children, (child, index) => {
 
@@ -70,27 +76,25 @@ export default ( props: TemplateProps) => {
 
             return React.cloneElement(child as React.ReactElement,{
                 setEnable: setEnable,
-                isEnable: isEnabled
+                isEnable: isEnabled,
+                isHidden: showArrow && !tabsToShow.includes(id)
             });
         }
     });
 
     globalTabs = newChildren;
 
-    let [animation, setAnimation] = useState<string>()
-    let [count, increaseCount] = useState<number>(0)
     const moveLeft = () => {
+
+        moveSelectedTab(globalTabs, false);
         const first: any = globalTabs.shift();
         globalTabs.push(first);
-        moveSelectedTab(globalTabs, false);
-        // increaseCount(count + 1);
     };
 
     const moveRight = () => {
         const last: any = globalTabs.pop();
         globalTabs.unshift(last);
         moveSelectedTab(globalTabs, true);
-        // increaseCount(count + 1);
     }
 
 
@@ -104,20 +108,16 @@ export default ( props: TemplateProps) => {
         tabs.forEach((tab, index) => {
             if(curSelected === tab.props.id) {
                 curSelectedIndex = index;
-                // navigate(tab.props.url);
-
             }
         })
-
         //right
         if(direction) {
-            selected = tabs[curSelectedIndex - 1].props.id
+            selected = tabs[curSelectedIndex - 1].props.id;
         }
         //left
         else {
             selected = tabs[curSelectedIndex + 1].props.id
         }
-
 
         setEnable(selected);
     }
@@ -125,17 +125,11 @@ export default ( props: TemplateProps) => {
 
     return (
         <div style={{minHeight: '30px', height: tabHeight + 'px'}} className={"w-full"}>
-
-
-            <FontAwesomeIcon icon={ faArrowLeft } size="lg" className={"mr-2 cursor-pointer " + arrowClass} onClick={ moveLeft }></FontAwesomeIcon>
-            <BrowserRouter>
-                <div className={"h-full inline-block animation1"} >
+            <FontAwesomeIcon icon={ faArrowLeft } size="lg" className={"mr-2 cursor-pointer " + (showArrow? '' : ' hidden')} onClick={ moveLeft }></FontAwesomeIcon>
+                <div className={"h-full inline-block"} >
                     { globalTabs }
                 </div>
-
-            </BrowserRouter>
-            <FontAwesomeIcon icon={ faArrowRight } size="lg" className={"cursor-pointer " + arrowClass} onClick={ moveRight }></FontAwesomeIcon>
-
+            <FontAwesomeIcon icon={ faArrowRight } size="lg" className={"cursor-pointer " + (showArrow? '' : 'hidden')} onClick={ moveRight }></FontAwesomeIcon>
         </div>
     )
 }
